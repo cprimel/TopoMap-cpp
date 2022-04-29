@@ -11,7 +11,7 @@
 TopoMap::TopoMap(size_t emstLeafSize, bool verbose): leafSize(emstLeafSize), verbose(verbose) {
 }
 
-std::vector<Point> TopoMap::project(std::vector<double> &data, int dimension) {
+std::vector<Point> TopoMap::project(std::vector<double> &data, size_t dimension) {
     std::vector<std::pair<int, int> > edges;
     std::vector<double> weights;
 
@@ -21,8 +21,8 @@ std::vector<Point> TopoMap::project(std::vector<double> &data, int dimension) {
     return this->placePoints(edges,weights);
 }
 
-void TopoMap::emst(std::vector<double> &data, int dim, std::vector<std::pair<int, int> > &edges, std::vector<double> &weights) {
-    int npts = data.size() / dim;
+void TopoMap::emst(std::vector<double> &data, size_t dim, std::vector<std::pair<int, int> > &edges, std::vector<double> &weights) const {
+    size_t npts = data.size() / dim;
     arma::mat pts(dim, npts);
     for(int i = 0;i < npts;i ++) {
         for(int j = 0;j < dim;j ++) {
@@ -54,7 +54,7 @@ void TopoMap::emst(std::vector<double> &data, int dim, std::vector<std::pair<int
         }
         unmappedResults(2, i) = results(2, i);
 
-        edges.push_back(std::pair<int,int>(unmappedResults(0, i), unmappedResults(1, i)));
+        edges.emplace_back(unmappedResults(0, i), unmappedResults(1, i));
         weights.push_back( unmappedResults(2, i));
     }
 }
@@ -78,8 +78,7 @@ std::vector<Point> TopoMap::placePoints(const std::vector<std::pair<int, int> > 
     }
     std::vector<int> order = sortEdges(edges,weights);
 
-    for(int _i = 0;_i < order.size();_i ++) {
-        int i = order[_i];
+    for(int i : order) {
         int p1 = edges[i].first;
         int p2 = edges[i].second;
 
@@ -100,8 +99,8 @@ std::vector<Point> TopoMap::placePoints(const std::vector<std::pair<int, int> > 
         compMap[c] = comp;
     }
     std::vector<Point> pts;
-    for(int i = 0;i < verts.size();i ++) {
-        pts.push_back(verts[i].p);
+    for(auto & vert : verts) {
+        pts.push_back(vert.p);
     }
     return pts;
 }
@@ -160,7 +159,7 @@ inline Point transform(const Point &p, const Transformation &t, double yOffset) 
     double yy = x * t.sin + y * t.cos;
 
     yy += yOffset;
-    return Point(xx,yy);
+    return {xx,yy};
 }
 
 void TopoMap::transformComponent(const Component &c, const Transformation &t, double yOffset) {
@@ -208,7 +207,7 @@ Component TopoMap::mergeComponents(Component &c1, Component &c2, int v1, int v2,
     return merged;
 }
 
-void TopoMap::log(std::string str) {
+void TopoMap::log(std::string str) const {
     if(verbose) {
         std::cout << str << std::endl;
     }

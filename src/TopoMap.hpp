@@ -20,17 +20,17 @@ class TOPOMAP_API TopoMap
 {
 public:
     TopoMap(size_t emstLeafSize = 1, bool verbose = false);
-    std::vector<Point> project(std::vector<double> &data, int dimension);
+    std::vector<Point> project(std::vector<double> &data, size_t dimension);
 
 protected:
-    void emst(std::vector<double> &data, int dimension, std::vector<std::pair<int, int>> &edges, std::vector<double> &weights);
+    void emst(std::vector<double> &data, size_t dimension, std::vector<std::pair<int, int>> &edges, std::vector<double> &weights) const;
     std::vector<Point> placePoints(const std::vector<std::pair<int, int>> &edges, const std::vector<double> &weights);
 
 protected:
     Component mergeComponents(Component &c1, Component &c2, int v1, int v2, double length);
     void transformComponent(const Component &c, const Transformation &t, double yOffset);
-    Transformation alignHull(const Polygon &hull, const Point &p, bool topEdge);
-    void log(std::string str);
+    static Transformation alignHull(const Polygon &hull, const Point &p, bool topEdge);
+    void log(std::string str) const;
 
 protected:
     DisjointSets<int> comps;

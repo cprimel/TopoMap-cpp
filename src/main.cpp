@@ -3,14 +3,14 @@
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
-#include <TopoMap.hpp>
+#include "TopoMap.hpp"
 
 std::string inputFile;
 std::string outputFile;
 int leafSize = 1;
 bool verbose = false;
 
-void readData(std::string dataFile, std::vector<double> &data, int &dim) {
+void readData(const std::string& dataFile, std::vector<double> &data, size_t &dim) {
     std::ifstream fi(dataFile);
     if(!fi.good()) {
         std::cerr << "Error reading file: " << dataFile << std::endl;
@@ -33,18 +33,18 @@ void readData(std::string dataFile, std::vector<double> &data, int &dim) {
             }
         }
         for(int d = 0;d < dim;d ++) {
-            double val = std::atof(list[d].c_str());
+            double val = std::stod(list[d]);
             data.push_back(val);
         }
     }
     fi.close();
 }
 
-void writeProjection(std::vector<Point> &pts, std::string opFile) {
+void writeProjection(std::vector<Point> &pts, const std::string& opFile) {
     std::ofstream fo(opFile);
     fo.precision(10);
-    for(int i = 0;i < pts.size();i ++) {
-        fo << pts[i].x << "," << pts[i].y << std::endl;
+    for(auto & pt : pts) {
+        fo << pt.x << "," << pt.y << std::endl;
     }
     fo.close();
 }
@@ -63,17 +63,17 @@ void parseArguments(int argc, char *argv[]) {
     for(int i = 1;i < argc;i ++) {
         std::string a(argv[i]);
         boost::trim(a);
-        if(a.compare("--input") == 0) {
+        if(a == "--input") {
             inputFile = std::string((argv[i+1]));
             boost::trim(inputFile);
             ct ++;
         }
-        if(a.compare("--output") == 0) {
+        if(a == "--output") {
             outputFile = std::string((argv[i+1]));
             boost::trim(outputFile);
             ct ++;
         }
-        if(a.compare("--leafsize") == 0) {
+        if(a == "--leafsize") {
             leafSize = atoi(argv[i+1]);
             if(leafSize < 1) {
                 std::cerr << "Invalid usage: leaf size should be greater than 0." << std::endl;
@@ -81,10 +81,10 @@ void parseArguments(int argc, char *argv[]) {
                 exit(0);
             }
         }
-        if(a.compare("--verbose") == 0) {
+        if(a == "--verbose") {
             verbose = true;
         }
-        if(a.compare("--help") == 0) {
+        if(a == "--help") {
             printUsage();
             exit(0);
         }
@@ -97,11 +97,14 @@ void parseArguments(int argc, char *argv[]) {
     }
 }
 
+/*
+ *
+ */
 int main(int argc, char *argv[]) {
     parseArguments(argc, argv);
 
     std::vector<double> data;
-    int dim;
+    size_t dim;
     readData(inputFile,data,dim);
     std::cerr << "read data file " << inputFile << " with dimension " << dim << std::endl;
 
