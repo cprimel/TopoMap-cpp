@@ -1,5 +1,7 @@
 /build
 /.idea
+/data
+*.png
 # Prerequisites
 *.d
 

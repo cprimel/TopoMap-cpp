@@ -2,11 +2,12 @@
 #define GEOMUTILS_H
 
 #include <vector>
+#include <complex>
 
 struct Point {
-    double x,y;
+    double x{},y{};
 
-    Point(){}
+    Point()= default;
     Point(double x, double y):x(x),y(y){}
 };
 
@@ -14,7 +15,7 @@ typedef std::vector<Point> Polygon;
 
 struct Vertex {
     Point p;
-    int id;
+    int id{};
 };
 
 struct Component {
@@ -28,8 +29,10 @@ struct Transformation {
     double cos, sin;
 };
 
-#define len(p) (std::sqrt(p.x * p.x + p.y * p.y))
-#define distance2(p1,p2) ((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
+inline double len(const Point &p) {return std::sqrt(p.x * p.x + p.y * p.y);};
+inline double distance2(const Point &p1,const Point &p2) {
+    return ((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+};
 
 std::vector<int> sortEdges(const std::vector<std::pair<int, int>> &edges, const std::vector<double> &weights);
 void findAngle(const Point &p1, const Point &p2, Transformation &t);

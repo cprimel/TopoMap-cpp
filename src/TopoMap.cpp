@@ -17,6 +17,7 @@ std::vector<Point> TopoMap::project(std::vector<double> &data, size_t dimension)
 
     log("computing emst");
     this->emst(data,dimension,edges,weights);
+
     log("placing points");
     return this->placePoints(edges,weights);
 }
@@ -57,6 +58,7 @@ void TopoMap::emst(std::vector<double> &data, size_t dim, std::vector<std::pair<
         edges.emplace_back(unmappedResults(0, i), unmappedResults(1, i));
         weights.push_back( unmappedResults(2, i));
     }
+
 }
 
 std::vector<Point> TopoMap::placePoints(const std::vector<std::pair<int, int> > &edges, const std::vector<double> &weights) {

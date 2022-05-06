@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
+#include <chrono>
 #include "TopoMap.hpp"
 
 std::string inputFile;
@@ -38,6 +39,7 @@ void readData(const std::string& dataFile, std::vector<double> &data, size_t &di
         }
     }
     fi.close();
+
 }
 
 void writeProjection(std::vector<Point> &pts, const std::string& opFile) {
@@ -103,15 +105,28 @@ void parseArguments(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     parseArguments(argc, argv);
 
+    double seconds;
+    auto start = std::chrono::steady_clock::now();
+
     std::vector<double> data;
     size_t dim;
     readData(inputFile,data,dim);
     std::cerr << "read data file " << inputFile << " with dimension " << dim << std::endl;
 
+
+
+
     TopoMap tm(leafSize,verbose);
     std::vector<Point> pts = tm.project(data,dim);
 
+
     std::cerr << "writing output" << std::endl;
     writeProjection(pts,outputFile);
+
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = end - start;
+    seconds = diff.count();
+    std::cerr<< "Execution time: " << seconds << " seconds." << std::endl;
+
     return 0;
 }
